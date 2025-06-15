@@ -1,6 +1,9 @@
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
+import MainCategories from "../components/MainCategories";
+import FeaturedPosts from "../components/FeaturedPosts";
+import PostList from "../components/PostList";
 
 const Homepage = () => {
   return (
@@ -83,10 +86,16 @@ const Homepage = () => {
           </button>
         </Link>
       </div>
+      {/* CATEGORIES */}
+      <MainCategories />
+
       {/* FEATURED POSTS */}
-      <section>//not complate yet</section>
+      <FeaturedPosts />
       {/* POST LIST */}
-      <section>//not complate yet</section>
+      <div>
+        <h1 className="my-8 text-2xl text-gray-600">Recent Posts</h1>
+        <PostList />
+      </div>
     </main>
   );
 };

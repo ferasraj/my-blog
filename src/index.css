@@ -3,12 +3,12 @@
 
 @theme {
   --font-montserrat: "Montserrat", sans-serif;
-  --color-main: "#e6e6ff";
+  --color-main: #e6e6ff;
 }
 
 @layer base {
   body {
-    @apply bg-[#e6e6ff] w-screen overflow-x-hidden font-montserrat;
+    @apply bg-main w-screen overflow-x-hidden font-montserrat;
   }
 }
 
