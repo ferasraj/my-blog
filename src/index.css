@@ -17,3 +17,12 @@
     animation-duration: 10000ms;
   }
 }
+
+.ql-container,
+.ql-editor,
+.ql-toolbar {
+  border: none !important;
+}
+.ql-toolbar {
+  border-bottom: rgb(197, 195, 195) 1px solid !important;
+}

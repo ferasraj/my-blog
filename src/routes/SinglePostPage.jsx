@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import Images from "../components/Images";
 import PostMenuActions from "../components/PostMenuActions";
 import Search from "../components/Search";
-import Comment from "../components/Comment";
 import Comments from "../components/Comments";
 
 const SinglePostPage = () => {
