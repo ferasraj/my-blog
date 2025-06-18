@@ -29,4 +29,3 @@ app.listen(3000, () => {
   connectDB();
   console.log("Server is running!");
 });
-console.log("Clerk Secret Key from .env:", process.env.CLERK_SECRET_KEY);
