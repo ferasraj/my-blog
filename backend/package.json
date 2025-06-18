@@ -11,8 +11,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@clerk/express": "^1.7.0",
     "express": "^5.1.0",
-    "mongodb": "^6.17.0",
-    "mongoose": "^8.15.2"
+    "mongoose": "^8.16.0",
+    "svix": "^1.67.0"
   }
 }
