@@ -13,7 +13,7 @@ const postSchema = new Schema(
     },
     title: {
       type: String,
-      required: true,
+      required: [true, "Title is required"],
     },
     slug: {
       type: String,

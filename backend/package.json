@@ -12,7 +12,11 @@
   "description": "",
   "dependencies": {
     "@clerk/express": "^1.7.0",
+    "@imagekit/react": "^5.0.1",
+    "@tanstack/react-query": "^5.80.7",
+    "cors": "^2.8.5",
     "express": "^5.1.0",
+    "imagekit": "^6.0.0",
     "mongoose": "^8.16.0",
     "svix": "^1.67.0"
   }

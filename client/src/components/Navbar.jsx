@@ -14,9 +14,9 @@ const Navbar = () => {
 
   useEffect(() => {
     getToken().then((token) => {
-      console.log(token);
+      // console.log(token);
     });
-  }, [getToken]);
+  }, []);
 
   const menuItems = [
     { name: "Home", path: "/" },
