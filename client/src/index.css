@@ -26,3 +26,10 @@
 .ql-toolbar {
   border-bottom: rgb(197, 195, 195) 1px solid !important;
 }
+
+.ql-editor.ql-blank::before {
+  color: #9ca3af; /* text-gray-400 */
+  font-style: normal !important;
+  font-family: var(--font-montserrat) !important;
+  font-size: 1.125rem !important; /* text-lg */
+}

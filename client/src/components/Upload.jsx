@@ -54,7 +54,7 @@ const Upload = ({ children, type, setProgress, setData }) => {
         ref={ref}
         accept={`${type}/*`}
       />
-      <div className="cursor-pointer" onClick={() => ref.current.click()}>
+      <div className="cursor-pointer w-fit" onClick={() => ref.current.click()}>
         {children}
       </div>
     </IKContext>

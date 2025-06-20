@@ -4,17 +4,30 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { twMerge } from "tailwind-merge";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Upload from "../components/Upload";
-import { Editor } from "primereact/editor";
+// import { Editor } from "primereact/editor";
 
 const Write = () => {
   const { isLoaded, isSignedIn } = useUser();
   const [value, setValue] = useState("");
   const [cover, setCover] = useState("");
+  const [img, setImg] = useState("");
+  const [video, setVideo] = useState("");
   const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    img && setValue((prev) => prev + `<p><image src="${img.url}"/></p>`);
+  }, [img]);
+
+  useEffect(() => {
+    video &&
+      setValue(
+        (prev) => prev + `<p><iframe class="ql-video" src="${video.url}"/></p>`
+      );
+  }, [video]);
 
   const navigate = useNavigate();
   const { getToken } = useAuth();
@@ -55,7 +68,7 @@ const Write = () => {
       content: value,
     };
     console.log(data);
-    mutation.mutate(data, {});
+    mutation.mutate(data);
   };
 
   return (
@@ -65,24 +78,11 @@ const Write = () => {
         <Upload type="image" setProgress={setProgress} setData={setCover}>
           <button
             type="button"
-            className="w-max p-2 shadow-md rounded-xl text-sm text-gray-500 bg-white"
+            className="cursor-pointer p-2 shadow-md rounded-xl text-sm text-gray-500 bg-white"
           >
             Add a cover image
           </button>
         </Upload>
-        <div className="progress-div flex gap-4 items-center">
-          {progress > 0 && (
-            <div className="w-1/2 flex-row bg-gray-200 rounded-full h-3 overflow-hidden ">
-              <div
-                className="bg-blue-600 h-full transition-all duration-300 ease-in-out "
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
-          )}
-          <p className="text-sm text-gray-600 mt-1 overflow-hidden">
-            {progress}%
-          </p>{" "}
-        </div>
 
         <input
           className="text-4xl font-semibold bg-transparent outline-none"
@@ -92,7 +92,7 @@ const Write = () => {
         />
         <div className="flex items-center gap-4">
           <label htmlFor="" className="text-sm">
-            Choose a category:
+            Choose a :
           </label>
           <select
             name="category"
@@ -108,14 +108,18 @@ const Write = () => {
           </select>
         </div>
         <textarea
-          className="p-4 rounded-xl bg-white shadow-md"
+          className="px-4 py-2 rounded-xl bg-white shadow-md ml-8 h-full"
           name="desc"
           placeholder="A Short Description"
         />
         <div className="flex flex-1">
-          <div className="flex flex-col gap-2 mr-2">
-            <Upload type="image">🌆</Upload>
-            <Upload type="video">▶️</Upload>
+          <div className="flex flex-col gap-2 mr-2 justify-center text-xl ">
+            <Upload type="image" setProgress={setProgress} setData={setImg}>
+              🌆
+            </Upload>
+            <Upload type="video" setProgress={setProgress} setData={setVideo}>
+              ▶️
+            </Upload>{" "}
           </div>
           {/* <Editor
             className="flex-1 py-2 rounded-xl bg-white shadow-md"
@@ -126,17 +130,32 @@ const Write = () => {
           /> */}
           <ReactQuill
             theme="snow"
-            className="flex-1 rounded-xl bg-white shadow-md"
+            className="flex-1 rounded-xl bg-white shadow-md h-[calc(100%+10px)] mb-14 "
             value={value}
             onChange={setValue}
             readOnly={0 < progress && progress < 100}
+            placeholder="Text Your Story Here "
           />
         </div>
+        <div className="progress-div flex gap-4 items-center ml-10">
+          {progress > 0 && (
+            <div className="w-1/2 flex-row bg-gray-200 rounded-full h-3 overflow-hidden ">
+              <div
+                className="bg-blue-600 h-full transition-all duration-300 ease-in-out "
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+          )}
+          <p className="text-sm text-gray-600 mt-1 overflow-hidden font-bold">
+            {progress}%
+          </p>
+        </div>
+
         <button
           disabled={mutation.isPending || (0 < progress && progress < 100)}
           className={twMerge(
-            "bg-blue-800 text-white font-medium rounded-xl mt-4 p-2 w-36",
-            " disabled:bg-blue-400 disabled:cursor-not-allowed mb-10 cursor-pointer"
+            "bg-blue-800 text-white font-medium rounded-xl mt-2 p-2 w-36",
+            " disabled:bg-blue-400 disabled:cursor-not-allowed mb-10 cursor-pointer ml-8"
           )}
         >
           {mutation.isPending ? "Loading..." : "Send"}
