@@ -1,12 +1,29 @@
 import Comment from "../models/comment.model.js";
 import User from "../models/user.model.js";
 
-export const getPostComments = async (req, res) => {
-  const comments = await Comment.find({ post: req.params.postId })
-    .populate("user", "username img")
-    .sort({ createdAt: -1 });
+// export const getPostComments = async (req, res) => {
+//   const comments = await Comment.find({ post: req.params.postId })
+//     .populate("user", "username img")
+//     .sort({ createdAt: -1 });
 
-  res.json(comments);
+//   res.json(comments);
+// };
+
+export const getPostComments = async (req, res) => {
+  const postId = req.params.postId;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+
+  const comments = await Comment.find({ post: postId })
+    .populate("user", "username img")
+    .sort({ createdAt: -1 }) // الأحدث أولًا
+    .limit(limit)
+    .skip((page - 1) * limit);
+
+  const total = await Comment.countDocuments({ post: postId });
+  const hasMore = page * limit < total;
+
+  res.status(200).json({ comments, hasMore });
 };
 
 export const addComment = async (req, res) => {
@@ -38,14 +55,14 @@ export const deleteComment = async (req, res) => {
     return res.status(401).json("Not authenticated!");
   }
 
-  //   const role = req.auth.sessionClaims?.metadata?.role || "user";
+  const role = req.auth.sessionClaims?.metadata?.role || "user";
 
-  //   if (role === "admin") {
-  //     await Comment.findByIdAndDelete(req.params.id);
-  //     return res.status(200).json("Comment has been deleted");
-  //   }
+  if (role === "admin") {
+    await Comment.findByIdAndDelete(req.params.id);
+    return res.status(200).json("Comment has been deleted");
+  }
 
-  const user = User.findOne({ clerkUserId });
+  const user = await User.findOne({ clerkUserId });
 
   const deletedComment = await Comment.findOneAndDelete({
     _id: id,

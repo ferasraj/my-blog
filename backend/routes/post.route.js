@@ -5,6 +5,7 @@ import {
   creatPost,
   deletePost,
   uploadAuth,
+  featurePost,
 } from "../controllers/post.controller.js";
 const router = express.Router();
 
@@ -14,5 +15,6 @@ router.get("/", getPosts);
 router.get("/:slug", getPost);
 router.post("/", creatPost);
 router.delete("/:id", deletePost);
+router.patch("/feature", featurePost);
 
 export default router;
