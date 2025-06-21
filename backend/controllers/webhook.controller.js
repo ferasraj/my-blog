@@ -28,11 +28,23 @@ export const clerkWebHook = async (req, res) => {
       clerkUserId: evt.data.id,
       username: evt.data.username || evt.data.email_addresses[0].email_address,
       email: evt.data.email_addresses[0].email_address,
-      img: evt.data.profile_img_url,
+      img: evt.data.profile_image_url,
     });
 
     await newUser.save();
   }
+  if (evt.type === "user.updated") {
+    await User.findOneAndUpdate(
+      { clerkUserId: evt.data.id },
+      {
+        username:
+          evt.data.username || evt.data.email_addresses[0].email_address,
+        email: evt.data.email_addresses[0].email_address,
+        img: evt.data.profile_image_url,
+      }
+    );
+  }
+
   if (evt.type === "user.deleted") {
     const deletedUser = await User.findOneAndDelete({
       clerkUserId: evt.data.id,

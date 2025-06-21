@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Upload from "../components/Upload";
+import { Link } from "react-router-dom";
 // import { Editor } from "primereact/editor";
 
 const Write = () => {
@@ -52,7 +53,27 @@ const Write = () => {
   }
 
   if (isLoaded && !isSignedIn) {
-    return <div className="">You should login!</div>;
+    return (
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800 flex flex-col gap-3">
+        <p className="font-medium">
+          Want to post your story?
+          <Link
+            to="/register"
+            className="underline text-blue-600 hover:text-blue-800"
+          >
+            Sign up
+          </Link>
+          or
+          <Link
+            to="/login"
+            className="underline text-blue-600 hover:text-blue-800"
+          >
+            Log in
+          </Link>{" "}
+          to leave a comment.
+        </p>
+      </div>
+    );
   }
 
   const handleSubmit = async (e) => {
