@@ -6,6 +6,8 @@ import Comments from "../components/Comments";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { format } from "timeago.js";
+import { Eye } from "lucide-react";
+import { EyeOff } from "lucide-react";
 
 const fetchPost = async (slug) => {
   const res = await axios.get(`${import.meta.env.VITE_API_URL}/posts/${slug}`);
@@ -28,8 +30,13 @@ const SinglePostPage = () => {
       {/* Details */}
       <div className=" flex gap-8">
         <div className="lg:w-3/5 flex flex-col gap-8 ">
-          <h1 className="text-xl md:text-3xl xl:text-4xl  2xl:text-5xl font-semibold">
+          <h1 className="text-xl flex  md:text-3xl xl:text-4xl 2xl:text-5xl font-semibold">
             {data.title}
+            {typeof data.visit === "number" && (
+              <span className="flex items-center translate-y-3 gap-1 text-[14px] text-gray-500 mx-5">
+                {data.visit === 0 ? <EyeOff /> : <Eye size={16} />} {data.visit}
+              </span>
+            )}
           </h1>
           <div className="flex items-center gap-2 text-sm text-gray-400 ">
             <span>Written By</span>

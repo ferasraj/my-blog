@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import Images from "../components/Images";
 import { twMerge } from "tailwind-merge";
 import { format } from "timeago.js";
+import { Eye } from "lucide-react";
+import { EyeOff } from "lucide-react";
 
 const PostListItem = ({ post, searchTerm = "" }) => {
   const highlightText = (text, term) => {
@@ -37,15 +39,16 @@ const PostListItem = ({ post, searchTerm = "" }) => {
         <div>
           <Link
             to={`/${post.slug}`}
-            className="text-2xl sm:text-4xl font-semibold w-fit"
+            className="flex  text-2xl sm:text-4xl font-semibold w-fit"
           >
             {highlightText(post.title, searchTerm)}
+
+            {typeof post.visit === "number" && (
+              <span className="flex items-center translate-y-0.5 gap-2 text-[14px] text-gray-500 mx-5">
+                {post.visit === 0 ? <EyeOff /> : <Eye size={16} />} {post.visit}
+              </span>
+            )}
           </Link>
-          {typeof post.visit === "number" && (
-            <span className="text-sm text-gray-500 ml-5">
-              ({post.visit} {post.visit <= 1 ? "view" : "views"})
-            </span>
-          )}
         </div>
         <div className="flex items-center gap-2 text-gray-400 text-sm">
           <span>Written By</span>
