@@ -33,9 +33,16 @@ const SinglePostPage = () => {
           </h1>
           <div className="flex items-center gap-2 text-sm text-gray-400 ">
             <span>Written By</span>
-            <Link className="text-blue-800">{data.user.username}</Link>
+            <Link
+              className="text-blue-800"
+              to={`/posts?author=${data.user.username}`}
+            >
+              {data.user.username}
+            </Link>
             <span>on</span>
-            <Link className="text-blue-800">{data.category}</Link>
+            <Link className="text-blue-800 " to={`/posts?cat=${data.category}`}>
+              {data.category}
+            </Link>
             <time>{format(data.createdAt)}</time>
           </div>
           <p className="text-gray-500 font-medium ">{data.desc}</p>
@@ -47,11 +54,11 @@ const SinglePostPage = () => {
         )}
       </div>
       {/* Content */}
-      <div className="flex flex-col md:flex-row gap-8">
+      <div className="flex flex-col md:flex-row gap-8 prose break-words ">
         {/* text */}
-        <div className=" lg:text-lg flex flex-col gap-6 text-justify w-full">
+        <div className=" lg:text-lg flex flex-col gap-6 text-justify w-full max-w-[calc(100%-300px)]">
           <div
-            className="prose max-w-none"
+            className=" "
             dangerouslySetInnerHTML={{ __html: data.content }}
           />
         </div>
@@ -66,7 +73,12 @@ const SinglePostPage = () => {
                 w="48"
                 h="48"
               />
-              <Link className="text-blue-800">{data.user.username}</Link>
+              <Link
+                className="text-blue-800"
+                to={`/posts?author=${data.user.username}`}
+              >
+                {data.user.username}
+              </Link>
             </div>
             <p className="text-sm text-gray-500 max-w-40 text-justify">
               user dis I will make it after complate the project with user

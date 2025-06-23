@@ -11,10 +11,14 @@ const SideMenu = () => {
         ...Object.fromEntries(searchParams.entries()),
         sort: e.target.value,
       });
+      // setSearchParams({
+      //   sort: e.target.value,
+      // });
     }
   };
   const handleCategoryChange = (category) => {
     if (searchParams.get("cat") !== category) {
+      // setSearchParams({ cat: category });
       setSearchParams({
         ...Object.fromEntries(searchParams.entries()),
         cat: category,
@@ -28,7 +32,7 @@ const SideMenu = () => {
       <Search />
       <h1 className="mt-8 mb-4 text-sm font-medium">Filter</h1>
       <div className="flex flex-col gap-2 text-sm">
-        <label className="flex items-center gap-2 cursor-pointer">
+        <label className="flex items-center gap-2 cursor-pointer w-fit hover:text-gray-800">
           <input
             type="radio"
             name="sort"
@@ -36,14 +40,14 @@ const SideMenu = () => {
             value="newest"
             className={twMerge(
               "appearance-none w-4 h-4 border-[1.5px] border-blue-800 cursor-pointer rounded-sm ",
-              "bg-white checked:bg-blue-800"
+              "bg-white checked:bg-blue-800 "
             )}
           />
           <span>Newest</span>
         </label>
         <label
           htmlFor="popular"
-          className="flex items-center gap-2 cursor-pointer"
+          className="flex items-center gap-2 cursor-pointer w-fit hover:text-gray-800"
         >
           <input
             id="popular"
@@ -60,7 +64,7 @@ const SideMenu = () => {
         </label>
         <label
           htmlFor="trending"
-          className="flex items-center gap-2 cursor-pointer"
+          className="flex items-center gap-2 cursor-pointer w-fit hover:text-gray-800"
         >
           <input
             id="trending"
@@ -77,7 +81,7 @@ const SideMenu = () => {
         </label>
         <label
           htmlFor="oldest"
-          className="flex items-center gap-2 cursor-pointer"
+          className="flex items-center gap-2 cursor-pointer w-fit hover:text-gray-800"
         >
           <input
             id="oldest"
@@ -96,37 +100,37 @@ const SideMenu = () => {
       <h1 className="mt-8 mb-4 text-sm font-medium">Categories</h1>
       <div className="flex flex-col gap-2 text-sm">
         <span
-          className="underline cursor-pointer"
-          onClick={() => handleCategoryChange("general")}
+          className="underline cursor-pointer w-fit hover:text-gray-800"
+          onClick={() => handleCategoryChange("")}
         >
           All
         </span>
         <span
-          className="underline cursor-pointer"
+          className="underline cursor-pointer w-fit hover:text-gray-800"
           onClick={() => handleCategoryChange("web-design")}
         >
           Web Design
         </span>
         <span
-          className="underline cursor-pointer"
+          className="underline cursor-pointer w-fit hover:text-gray-800"
           onClick={() => handleCategoryChange("development")}
         >
           Development
         </span>
         <span
-          className="underline cursor-pointer"
+          className="underline cursor-pointer w-fit hover:text-gray-800"
           onClick={() => handleCategoryChange("databases")}
         >
           Databases
         </span>
         <span
-          className="underline cursor-pointer"
+          className="underline cursor-pointer w-fit hover:text-gray-800"
           onClick={() => handleCategoryChange("seo")}
         >
           Search Engines
         </span>
         <span
-          className="underline cursor-pointer"
+          className="underline cursor-pointer w-fit hover:text-gray-800"
           onClick={() => handleCategoryChange("marketing")}
         >
           Marketing

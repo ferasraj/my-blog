@@ -20,8 +20,8 @@ const Navbar = () => {
 
   const menuItems = [
     { name: "Home", path: "/" },
-    { name: "Trending", path: "/" },
-    { name: "Most Popular", path: "/" },
+    { name: "Trending", path: "posts?sort=trending" },
+    { name: "Most Popular", path: "/posts?sort=popular" },
     { name: "About", path: "/" },
   ];
 
@@ -90,9 +90,9 @@ const Navbar = () => {
         )}
       >
         <Link to="/">Home</Link>
-        <Link to="/">Trending</Link>
-        <Link to="/">Most Popular</Link>
-        <Link to="/">About</Link>
+        <Link to="posts?sort=trending">Trending</Link>
+        <Link to="/posts?sort=popular">Most Popular</Link>
+        <Link to="/about">About</Link>
 
         <SignedOut>
           <Link

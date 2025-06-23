@@ -12,6 +12,7 @@ import MainLayout from "./layouts/MainLayout.jsx";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Icons, ToastContainer } from "react-toastify";
+import About from "./routes/About.jsx";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,10 @@ const router = createBrowserRouter([
       {
         path: "/register",
         element: <RegisterPage />,
+      },
+      {
+        path: "/about",
+        element: <About />,
       },
       {
         path: "*",
