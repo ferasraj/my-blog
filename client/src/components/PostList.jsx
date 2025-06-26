@@ -13,7 +13,7 @@ const PostList = ({ isInfinite = true }) => {
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/posts`, {
       params: {
         page: isInfinite ? pageParam : 1,
-        limit: isInfinite ? 2 : 1000, // أو خليه فارغ لو تبي كلهم
+        limit: isInfinite ? 3 : 1000, // أو خليه فارغ لو تبي كلهم
         ...searchParamsObj,
       },
     });
@@ -24,8 +24,24 @@ const PostList = ({ isInfinite = true }) => {
     queryKey: ["posts", searchParams.toString(), isInfinite],
     queryFn: ({ pageParam = 1 }) => fetchPosts(pageParam),
     initialPageParam: 1,
-    getNextPageParam: (lastPage, pages) =>
-      lastPage.hasMore && isInfinite ? pages.length + 1 : undefined,
+    getNextPageParam: (lastPage, pages) => {
+      console.log("📦 lastPage:", lastPage);
+      console.log("📄 all pages so far:", pages);
+
+      if (lastPage.posts.length === 0) {
+        console.log("⛔ No more posts in current filter (ex: category)!");
+        return undefined;
+      }
+
+      if (!lastPage.hasMore) {
+        console.log("✅ No more pages to fetch");
+        return undefined;
+      }
+
+      const nextPage = pages.length + 1;
+      console.log("➡️ Fetching next page:", nextPage);
+      return nextPage;
+    },
   });
 
   if (status === "loading") return "Loading...";

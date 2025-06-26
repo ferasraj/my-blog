@@ -9,68 +9,109 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Upload from "../components/Upload";
 import { Link } from "react-router-dom";
-// import { Editor } from "primereact/editor";
+import { useQueryClient } from "@tanstack/react-query"; // تأكد تضيف هذا
 
-const Write = () => {
+const Write = ({ isEdit = false, defaultData = {} }) => {
   const { isLoaded, isSignedIn } = useUser();
-  const [value, setValue] = useState("");
-  const [cover, setCover] = useState("");
-  const [img, setImg] = useState("");
-  const [video, setVideo] = useState("");
-  const [progress, setProgress] = useState(0);
+  const [value, setValue] = useState(defaultData.content || "");
+  const [cover, setCover] = useState(
+    defaultData.img ? { url: defaultData.img } : {}
+  );
 
+  const [progress, setProgress] = useState(0);
+  const [title, setTitle] = useState(defaultData.title || "");
+  const [desc, setDesc] = useState(defaultData.desc || "");
+  const [category, setCategory] = useState(defaultData.category || "general");
+  const [isUploading, setIsUploading] = useState(false);
+
+  //!
+  const [img, setImg] = useState(null);
+  const [video, setVideo] = useState(null);
   useEffect(() => {
-    img && setValue((prev) => prev + `<p><image src="${img.url}"/></p>`);
+    if (img?.url) {
+      console.log("🖼️ Adding image:", img.url);
+      setValue((prev) => prev + `<p><img src="${img.url}" /></p>`);
+      setImg(null); // reset بعد الإضافة
+    }
   }, [img]);
 
   useEffect(() => {
-    video &&
+    if (video?.url) {
+      console.log("🎥 Adding video:", video.url);
       setValue(
         (prev) => prev + `<p><iframe class="ql-video" src="${video.url}"/></p>`
       );
+      setVideo(null); // reset بعد الإضافة
+    }
   }, [video]);
-
+  useEffect(() => {
+    console.log("📝 Updated content:", value);
+  }, [value]);
   const navigate = useNavigate();
   const { getToken } = useAuth();
+  const queryClient = useQueryClient(); // داخل الكومبوننت
 
   const mutation = useMutation({
-    mutationFn: async (newPost) => {
+    mutationFn: async (postData) => {
       const token = await getToken();
-      return axios.post(`${import.meta.env.VITE_API_URL}/posts`, newPost, {
+      const url = isEdit
+        ? `${import.meta.env.VITE_API_URL}/posts/${defaultData._id}`
+        : `${import.meta.env.VITE_API_URL}/posts`;
+      const method = isEdit ? axios.patch : axios.post;
+
+      return method(url, postData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
     },
     onSuccess: (res) => {
-      toast.success("Post has been created");
+      toast.success(isEdit ? "Post updated" : "Post created");
+      queryClient.setQueryData(["post", res.data.slug], res.data);
+      queryClient.setQueryData(["featuredPosts"], (oldData) => {
+        if (!oldData) return oldData;
+
+        return {
+          ...oldData,
+          posts: oldData.posts.map((p) =>
+            p._id === res.data._id ? res.data : p
+          ),
+        };
+      });
+
+      queryClient.setQueryData(["posts", "", true], (oldData) => {
+        if (!oldData) return oldData;
+
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page) => ({
+            ...page,
+            posts: page.posts.map((p) =>
+              p._id === res.data._id ? res.data : p
+            ),
+          })),
+        };
+      });
+
       navigate(`/${res.data.slug}`);
     },
   });
 
-  if (!isLoaded) {
-    return <div className="">Loading...</div>;
-  }
+  if (!isLoaded) return <div>Loading...</div>;
 
   if (isLoaded && !isSignedIn) {
     return (
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800 flex flex-col gap-3">
         <p className="font-medium">
           Want to post your story?
-          <Link
-            to="/register"
-            className="underline text-blue-600 hover:text-blue-800"
-          >
+          <Link to="/register" className="underline text-blue-600">
             Sign up
-          </Link>
+          </Link>{" "}
           or
-          <Link
-            to="/login"
-            className="underline text-blue-600 hover:text-blue-800"
-          >
+          <Link to="/login" className="underline text-blue-600">
             Log in
           </Link>{" "}
-          to leave a comment.
+          to post.
         </p>
       </div>
     );
@@ -78,47 +119,73 @@ const Write = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const form = e.target;
-    const formData = new FormData(form);
-
     const data = {
-      img: cover.filePath || "",
-      title: formData.get("title"),
-      category: formData.get("category"),
-      desc: formData.get("desc"),
+      title,
+      desc,
       content: value,
+      category,
+      img: cover.url || "",
     };
-    console.log(data);
+    console.log("📤 Data to send:", data); // <-- هنا نشوف إذا img فاضي أو لا
+
     mutation.mutate(data);
   };
 
   return (
-    <div className="h-[calc(100vh-64px)] md:h-[calc(100vh-80px)] flex flex-col gap-6 ">
-      <h1 className="text-xl font-light">Creat a New Post </h1>
+    <div className="h-[calc(100vh-64px)] md:h-[calc(100vh-80px)] flex flex-col gap-6">
+      <h1 className="text-xl font-light">
+        {isEdit ? "Edit your Post" : "Create a New Post"}
+      </h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-6 flex-1 mb-6">
-        <Upload type="image" setProgress={setProgress} setData={setCover}>
-          <button
-            type="button"
-            className="cursor-pointer p-2 shadow-md rounded-xl text-sm text-gray-500 bg-white"
-          >
-            Add a cover image
-          </button>
-        </Upload>
+        <div>
+          <div className="flex items-center gap-4">
+            <Upload
+              type="image"
+              setProgress={setProgress}
+              setData={setCover}
+              setIsUploading={setIsUploading}
+            >
+              <button
+                type="button"
+                className="cursor-pointer p-2 shadow-md rounded-xl text-sm text-gray-500 bg-white"
+              >
+                {cover?.url ? "Change Image" : "Add a Cover Image"}
+              </button>
+            </Upload>
 
+            {cover?.url && (
+              <div className="relative w-20 h-14">
+                <img
+                  src={cover.url}
+                  alt="cover"
+                  className="w-full h-full object-cover rounded-lg shadow"
+                />
+                <button
+                  type="button"
+                  onClick={() => setCover({})}
+                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center"
+                  title="Remove cover"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
         <input
           className="text-4xl font-semibold bg-transparent outline-none"
           type="text"
           placeholder="My Awesome Story"
-          name="title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
         <div className="flex items-center gap-4">
-          <label htmlFor="" className="text-sm">
-            Choose a :
-          </label>
+          <label className="text-sm">Choose a :</label>
           <select
             name="category"
-            id=""
-            className="p-2 rounded-xl bg-white shadow-md focus:outline-none"
+            className="p-2 rounded-xl bg-white shadow-md"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
           >
             <option value="general">General</option>
             <option value="web-design">Web Design</option>
@@ -132,37 +199,42 @@ const Write = () => {
           className="px-4 py-2 rounded-xl bg-white shadow-md ml-8 h-full"
           name="desc"
           placeholder="A Short Description"
+          value={desc}
+          onChange={(e) => setDesc(e.target.value)}
         />
         <div className="flex flex-1">
           <div className="flex flex-col gap-2 mr-2 justify-center text-xl ">
-            <Upload type="image" setProgress={setProgress} setData={setImg}>
+            <Upload
+              type="image"
+              setProgress={setProgress}
+              setIsUploading={setIsUploading}
+              setData={(res) => setImg({ url: res.url })} // ✅ هنا نتعامل مع الكومبوننت فقط
+            >
               🌆
             </Upload>
-            <Upload type="video" setProgress={setProgress} setData={setVideo}>
+            <Upload
+              type="video"
+              setProgress={setProgress}
+              setIsUploading={setIsUploading}
+              setData={(res) => setVideo({ url: res.url })} // ✅ نفس الشي
+            >
               ▶️
-            </Upload>{" "}
+            </Upload>
           </div>
-          {/* <Editor
-            className="flex-1 py-2 rounded-xl bg-white shadow-md"
-            value={text}
-            onTextChange={(e) => setText(e.htmlValue)}
-            style={{ height: "320px" }}
-            placeholder="text your story here"
-          /> */}
           <ReactQuill
             theme="snow"
-            className="flex-1 rounded-xl bg-white shadow-md h-[calc(100%+10px)] mb-14 max-w-[calc(100%-29px)] "
+            className="flex-1 rounded-xl bg-white shadow-md h-[calc(100%+10px)] mb-14 max-w-[calc(100%-29px)]"
             value={value}
             onChange={setValue}
             readOnly={0 < progress && progress < 100}
-            placeholder="Text Your Story Here "
+            placeholder="Text Your Story Here"
           />
         </div>
         <div className="progress-div flex gap-4 items-center ml-10">
           {progress > 0 && (
-            <div className="w-1/2 flex-row bg-gray-200 rounded-full h-3 overflow-hidden ">
+            <div className="w-1/2 flex-row bg-gray-200 rounded-full h-3 overflow-hidden">
               <div
-                className="bg-blue-600 h-full transition-all duration-300 ease-in-out "
+                className="bg-blue-600 h-full transition-all duration-300 ease-in-out"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
@@ -171,15 +243,18 @@ const Write = () => {
             {progress}%
           </p>
         </div>
-
         <button
-          disabled={mutation.isPending || (0 < progress && progress < 100)}
+          disabled={
+            mutation.isPending ||
+            isUploading || // ⛔ يمنع الضغط لو في رفع شغال
+            (0 < progress && progress < 100)
+          }
           className={twMerge(
             "bg-blue-800 text-white font-medium rounded-xl mt-2 p-2 w-36",
-            " disabled:bg-blue-400 disabled:cursor-not-allowed mb-10 cursor-pointer ml-8"
+            "disabled:bg-blue-400 disabled:cursor-not-allowed mb-10 cursor-pointer ml-8"
           )}
         >
-          {mutation.isPending ? "Loading..." : "Send"}
+          {mutation.isPending ? "Loading..." : isEdit ? "Update" : "Create"}
         </button>
         {mutation.isError && (
           <span className="text-red-500">

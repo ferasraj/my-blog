@@ -1,9 +1,17 @@
 import { format } from "timeago.js";
 import Images from "./Images";
 import { useAuth, useUser } from "@clerk/clerk-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useState } from "react";
+
+const fetchPostById = async (postId) => {
+  const res = await axios.get(
+    `${import.meta.env.VITE_API_URL}/posts/find/${postId}`
+  );
+  return res.data;
+};
 
 const Comment = ({ comment, postId }) => {
   const { user } = useUser();
@@ -12,7 +20,24 @@ const Comment = ({ comment, postId }) => {
 
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
+  const { data: postData } = useQuery({
+    queryKey: ["postOwner", postId],
+    queryFn: () => fetchPostById(postId),
+    enabled: !!postId,
+  });
+
+  const isAuthor = postData?.user?.clerkUserId === user?.id;
+  const isCommentAuthor = comment.user.username === user?.username;
+  const isAdmin = role === "admin";
+
+  const canDelete = isAdmin || isCommentAuthor || isAuthor;
+
+  // 🟡 حالة التعديل
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedText, setEditedText] = useState(comment.desc);
+
+  // ✅ حذف تعليق
+  const deleteMutation = useMutation({
     mutationFn: async () => {
       const token = await getToken();
       return axios.delete(
@@ -33,6 +58,30 @@ const Comment = ({ comment, postId }) => {
     },
   });
 
+  // ✅ تعديل تعليق
+  const editMutation = useMutation({
+    mutationFn: async (newDesc) => {
+      const token = await getToken();
+      return axios.put(
+        `${import.meta.env.VITE_API_URL}/comments/${comment._id}`,
+        { desc: newDesc },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+      toast.success("Comment updated");
+      setIsEditing(false);
+    },
+    onError: (error) => {
+      toast.error(error.response.data);
+    },
+  });
+
   return (
     <div className="p-4 bg-slate-50 rounded-xl mb-8">
       <div className="flex items-center gap-4">
@@ -47,19 +96,56 @@ const Comment = ({ comment, postId }) => {
         <span className="text-sm text-gray-500">
           {format(comment.createdAt)}
         </span>
-        {user &&
-          (comment.user.username === user.username || role === "admin") && (
+        {user && canDelete && (
+          <>
             <span
-              className="text-xs text-red-300 hover:text-red-500 cursor-pointer"
-              onClick={() => mutation.mutate()}
+              className="text-xs text-red-300 hover:text-red-500 cursor-pointer ml-2 hover:underline"
+              onClick={() => deleteMutation.mutate()}
             >
               delete
-              {mutation.isPending && <span>(in progress)</span>}
+              {deleteMutation.isPending && <span> (in progress)</span>}
             </span>
-          )}
+            {isCommentAuthor && !isEditing && (
+              <span
+                onClick={() => setIsEditing(true)}
+                className="text-xs text-blue-300 hover:text-blue-500 hover:underline cursor-pointer ml-2"
+              >
+                edit
+              </span>
+            )}
+          </>
+        )}
       </div>
+
       <div className="mt-4">
-        <p>{comment.desc}</p>
+        {isEditing ? (
+          <>
+            <textarea
+              value={editedText}
+              onChange={(e) => setEditedText(e.target.value)}
+              className="w-full p-2 rounded-xl border border-gray-300"
+            />
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={() => editMutation.mutate(editedText)}
+                className="text-sm text-green-600 cursor-pointer hover:underline"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => {
+                  setIsEditing(false);
+                  setEditedText(comment.desc);
+                }}
+                className="text-sm text-gray-500 cursor-pointer hover:underline"
+              >
+                Cancel
+              </button>
+            </div>
+          </>
+        ) : (
+          <p>{comment.desc}</p>
+        )}
       </div>
     </div>
   );

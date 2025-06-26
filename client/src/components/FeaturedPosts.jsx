@@ -16,6 +16,7 @@ const FeaturedPosts = () => {
   const { isPending, error, data } = useQuery({
     queryKey: ["featuredPosts"],
     queryFn: () => fetchPost(),
+    // refetchInterval: 30000,
   });
 
   if (isPending) return "loading...";
@@ -34,6 +35,7 @@ const FeaturedPosts = () => {
         {posts[0].img && (
           <Images
             src={posts[0].img}
+            updatedAt={posts[0].updatedAt}
             className="rounded-3xl object-cover"
             w="895"
             h="550"
@@ -42,7 +44,12 @@ const FeaturedPosts = () => {
         {/* details */}
         <section className="flex items-center gap-4">
           <h1 className="font-semibold lg:text-lg">01.</h1>
-          <Link className="text-blue-800 lg:text-lg">{posts[0].category}</Link>
+          <Link
+            className="text-blue-800 lg:text-lg"
+            to={`/posts?cat=${posts[0].category}`}
+          >
+            {posts[0].category}
+          </Link>
           <time className="text-gray-500">{format(posts[0].createdAt)}</time>
         </section>
         {/* title */}
@@ -62,6 +69,7 @@ const FeaturedPosts = () => {
               <div className="w-1/3 aspect-video">
                 <Images
                   src={posts[1].img}
+                  updatedAt={posts[1].updatedAt}
                   className="rounded-3xl object-cover w-full h-full"
                   w="298"
                 />
@@ -72,7 +80,12 @@ const FeaturedPosts = () => {
               {/* details */}
               <section className="flex items-center gap-4 text-sm lg:text-base mb-4">
                 <h1 className="font-semibold">02.</h1>
-                <Link className="text-blue-800 ">{posts[1].category}</Link>
+                <Link
+                  className="text-blue-800 "
+                  to={`/posts?cat=${posts[1].category}`}
+                >
+                  {posts[1].category}
+                </Link>
                 <time className="text-gray-500 text-sm">
                   {format(posts[1].createdAt)}
                 </time>
@@ -94,6 +107,7 @@ const FeaturedPosts = () => {
               <div className="w-1/3 aspect-video">
                 <Images
                   src={posts[2].img}
+                  updatedAt={posts[2].updatedAt}
                   className="rounded-3xl object-cover w-full h-full"
                   w="298"
                 />
@@ -104,7 +118,12 @@ const FeaturedPosts = () => {
               {/* details */}
               <section className="flex items-center gap-4 text-sm lg:text-base mb-4">
                 <h1 className="font-semibold">03.</h1>
-                <Link className="text-blue-800 ">{posts[2].category}</Link>
+                <Link
+                  className="text-blue-800 "
+                  to={`/posts?cat=${posts[2].category}`}
+                >
+                  {posts[2].category}
+                </Link>
                 <time className="text-gray-500 text-sm">
                   {format(posts[2].createdAt)}
                 </time>
@@ -126,6 +145,7 @@ const FeaturedPosts = () => {
               <div className="w-1/3 aspect-video">
                 <Images
                   src={posts[3].img}
+                  updatedAt={posts[3].updatedAt}
                   className="rounded-3xl object-cover w-full h-full"
                   w="298"
                 />
@@ -136,7 +156,12 @@ const FeaturedPosts = () => {
               {/* details */}
               <section className="flex items-center gap-4 text-sm lg:text-base mb-4">
                 <h1 className="font-semibold">04.</h1>
-                <Link className="text-blue-800 ">{posts[3].category}</Link>
+                <Link
+                  className="text-blue-800 "
+                  to={`/posts?cat=${posts[3].category}`}
+                >
+                  {posts[3].category}
+                </Link>
                 <time className="text-gray-500 text-sm">
                   {format(posts[3].createdAt)}
                 </time>

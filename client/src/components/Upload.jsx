@@ -23,7 +23,7 @@ const authenticator = async () => {
   }
 };
 
-const Upload = ({ children, type, setProgress, setData }) => {
+const Upload = ({ children, type, setProgress, setData, setIsUploading }) => {
   const ref = useRef(null);
 
   const onError = (err) => {
@@ -31,11 +31,13 @@ const Upload = ({ children, type, setProgress, setData }) => {
     toast.error("Image upload failed!");
   };
   const onSuccess = (res) => {
-    console.log(res);
-    setData(res);
+    console.log("✅ Image Uploaded:", res); // <-- هنا
+    setIsUploading(false); // ✅ خلص الرفع
+
+    setData({ url: res.url }); // ✅ هذا الصح
   };
   const onUploadProgress = (progress) => {
-    console.log(progress);
+    setIsUploading(true); // ✅ بدأ الرفع
     setProgress(Math.round((progress.loaded / progress.total) * 100));
   };
 

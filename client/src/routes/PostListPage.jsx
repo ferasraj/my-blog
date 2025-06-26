@@ -16,7 +16,7 @@ const PostListPage = () => {
       </button>
       <div className="flex flex-col-reverse gap-8 md:flex-row justify-between">
         <div className="">
-          <PostList isInfinite={false} />
+          <PostList isInfinite={true} />
         </div>
         <div className={`${open ? "block" : "hidden"} md:block`}>
           <SideMenu />

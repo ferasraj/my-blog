@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 import { format } from "timeago.js";
 import { Eye } from "lucide-react";
 import { EyeOff } from "lucide-react";
+import DeletePostButton from "../components/DeletePostButton";
 
 const PostListItem = ({ post, searchTerm = "" }) => {
   const highlightText = (text, term) => {
@@ -20,6 +21,7 @@ const PostListItem = ({ post, searchTerm = "" }) => {
       )
     );
   };
+
   return (
     <article className={twMerge("flex flex-col xl:flex-row gap-8 mb-8")}>
       {/* image */}
@@ -71,6 +73,7 @@ const PostListItem = ({ post, searchTerm = "" }) => {
         >
           Read More
         </Link>
+        <DeletePostButton post={post} />
       </div>
     </article>
   );

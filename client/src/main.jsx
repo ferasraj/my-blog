@@ -13,6 +13,7 @@ import { ClerkProvider } from "@clerk/clerk-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Icons, ToastContainer } from "react-toastify";
 import About from "./routes/About.jsx";
+import EditPost from "./routes/EditPost.jsx";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
       {
         path: "/about",
         element: <About />,
+      },
+      {
+        path: "/posts/:slug/edit",
+        element: <EditPost />,
       },
       {
         path: "*",

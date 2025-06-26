@@ -8,6 +8,7 @@ import axios from "axios";
 import { format } from "timeago.js";
 import { Eye } from "lucide-react";
 import { EyeOff } from "lucide-react";
+import { useUser } from "@clerk/clerk-react";
 
 const fetchPost = async (slug) => {
   const res = await axios.get(`${import.meta.env.VITE_API_URL}/posts/${slug}`);
@@ -20,6 +21,11 @@ const SinglePostPage = () => {
     queryKey: ["post", slug],
     queryFn: () => fetchPost(slug),
   });
+  const { user } = useUser();
+  const isAuthor = user && data && user.id === data.user.clerkUserId;
+  const isAdmin =
+    user && user.publicMetadata && user.publicMetadata.role === "admin";
+
   console.log(data);
 
   if (isPending) return "Loading...";
@@ -53,7 +59,16 @@ const SinglePostPage = () => {
             <time>{format(data.createdAt)}</time>
           </div>
           <p className="text-gray-500 font-medium ">{data.desc}</p>
+          {(isAuthor || isAdmin) && (
+            <Link
+              to={`/posts/${data.slug}/edit`}
+              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Edit Post
+            </Link>
+          )}
         </div>
+
         {data.img && (
           <div className="hidden lg:block w-2/5 h-fit">
             <Images src={data.img} w="600" h="350" className="rounded-2xl" />
